@@ -21,7 +21,6 @@ import {
   FONT_MUTED,
 } from '../../utils/colors';
 import {IconBack} from '../../assets';
-
 import {addNote} from '../../redux/listsSlice';
 
 const WindowHeight = Dimensions.get('window').height;

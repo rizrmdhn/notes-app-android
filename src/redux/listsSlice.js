@@ -7,6 +7,7 @@ export const listsSlice = createSlice({
     name: 'lists',
     initialState: {
         lists: getInitialData(),
+        unFilteredLists: getInitialData(),
         viewData: [],
     },
     reducers: {
@@ -19,6 +20,7 @@ export const listsSlice = createSlice({
                 archived: false,
             };
             state.lists.push(newList);
+            state.unFilteredLists.push(newList);
         },
         archiveNote: (state, action) => {
             const list = state.lists.find((item) => item.id === action.payload.id);
@@ -33,9 +35,16 @@ export const listsSlice = createSlice({
         setViewData: (state, action) => {
             state.viewData = action.payload.lists;
         },
+        searchNotes: (state, action) => {
+            if (action.payload.searchText.length !== 0 && action.payload.searchText.trim() !== '') {
+                state.lists = state.unFilteredLists.filter((list) => list.title.toLowerCase().includes(action.payload.searchText.toLowerCase()));
+            } else {
+                state.lists = state.unFilteredLists;
+            }
+        },
     },
 });
 
-export const { addNote, archiveNote, deleteNote, setViewData } = listsSlice.actions;
+export const { addNote, archiveNote, deleteNote, setViewData, searchNotes } = listsSlice.actions;
 
 export default listsSlice.reducer;
