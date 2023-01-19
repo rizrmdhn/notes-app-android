@@ -1,4 +1,4 @@
-import {StyleSheet, View, TouchableOpacity, Dimensions} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {IconAdd} from '../../assets';
