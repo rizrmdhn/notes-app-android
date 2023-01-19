@@ -11,7 +11,9 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import React, {Component} from 'react';
+import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
 import {
   BACKGROUND_COLOR_PRIMARY,
   BACKGROUND_COLOR_SECONDARY,
@@ -19,6 +21,8 @@ import {
   FONT_MUTED,
 } from '../../utils/colors';
 import {IconBack} from '../../assets';
+
+import {addNote} from '../../redux/listsSlice';
 
 const WindowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
@@ -105,80 +109,74 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class AddNewNote extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      title: '',
-      body: '',
-      limit: 50,
-    };
+export default function AddNewNote() {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-    this.onBackButton = this.onBackButton.bind(this);
-    this.onSubmitChangeEventHandler =
-      this.onSubmitChangeEventHandler.bind(this);
-  }
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [limit] = useState(50);
 
-  onBackButton() {
-    this.props.navigation.navigate('NotesPage');
-  }
-
-  onSubmitChangeEventHandler() {
-    if (this.state.title === '' || this.state.body === '') {
+  const onBackButton = () => {
+    navigation.navigate('NotesPage');
+  };
+  const onSubmitChangeEventHandler = () => {
+    if (title === '' || body === '') {
       Alert.alert('Form is empty', 'Please fill the form');
     } else {
-      this.props.navigation.navigate('NotesPage', {
-        addData: {
-          title: this.state.title,
-          body: this.state.body,
-        },
-      });
+      dispatch(
+        addNote({
+          title,
+          body,
+        }),
+      );
+      Alert.alert('Success', 'Note has been added');
+      setTitle('');
+      setBody('');
     }
-  }
+  };
 
-  render() {
-    return (
-      <View style={styles.addNoteContainer}>
-        <TouchableOpacity onPress={this.onBackButton}>
-          <View style={styles.addNoteContainerHeader}>
-            <IconBack />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.addNoteContainerHeaderTitle}>
-          <Text style={styles.addNewTitle}>Add New Note</Text>
+  return (
+    <View style={styles.addNoteContainer}>
+      <TouchableOpacity onPress={onBackButton}>
+        <View style={styles.addNoteContainerHeader}>
+          <IconBack />
         </View>
-        <View style={styles.maxCharTitle}>
-          <Text style={{color: FONT_COLOR, alignSelf: 'flex-end'}}>
-            Sisa Karakter Judul: {this.state.title.length}/{this.state.limit}
-          </Text>
-        </View>
-        <View style={styles.addNoteContainerTitle}>
-          <TextInput
-            style={styles.titleInput}
-            placeholder="Ini adalah judul ..."
-            placeholderTextColor={FONT_MUTED}
-            defaultValue={this.state.title}
-            onChangeText={text => this.setState({title: text})}
-            maxLength={this.state.limit}
-          />
-        </View>
-        <View style={styles.addNoteContainerBody}>
-          <TextInput
-            style={styles.bodyInput}
-            placeholder="Tuliskan Catatanmu di sini ..."
-            placeholderTextColor={FONT_MUTED}
-            defaultValue={this.state.body}
-            onChangeText={text => this.setState({body: text})}
-          />
-        </View>
-        <View style={styles.addNoteContainerButton}>
-          <Button
-            onPress={this.onSubmitChangeEventHandler}
-            color={BACKGROUND_COLOR_SECONDARY}
-            title="Add Note"
-          />
-        </View>
+      </TouchableOpacity>
+      <View style={styles.addNoteContainerHeaderTitle}>
+        <Text style={styles.addNewTitle}>Add New Note</Text>
       </View>
-    );
-  }
+      <View style={styles.maxCharTitle}>
+        <Text style={{color: FONT_COLOR, alignSelf: 'flex-end'}}>
+          Sisa Karakter Judul: {title.length}/{limit}
+        </Text>
+      </View>
+      <View style={styles.addNoteContainerTitle}>
+        <TextInput
+          style={styles.titleInput}
+          placeholder="Ini adalah judul ..."
+          placeholderTextColor={FONT_MUTED}
+          defaultValue={title}
+          onChangeText={text => setTitle(text)}
+          maxLength={limit}
+        />
+      </View>
+      <View style={styles.addNoteContainerBody}>
+        <TextInput
+          style={styles.bodyInput}
+          placeholder="Tuliskan Catatanmu di sini ..."
+          placeholderTextColor={FONT_MUTED}
+          defaultValue={body}
+          onChangeText={text => setBody(text)}
+        />
+      </View>
+      <View style={styles.addNoteContainerButton}>
+        <Button
+          onPress={onSubmitChangeEventHandler}
+          color={BACKGROUND_COLOR_SECONDARY}
+          title="Add Note"
+        />
+      </View>
+    </View>
+  );
 }

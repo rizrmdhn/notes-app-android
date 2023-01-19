@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
+import {useDispatch} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {BACKGROUND_COLOR_SECONDARY, FONT_COLOR} from '../../utils/colors';
 import {showFormattedDate} from '../../utils/notesData';
+import {setViewData} from '../../redux/listsSlice';
 
 const windowWidth = Dimensions.get('window').width;
 const WindowHeight = Dimensions.get('window').height;
@@ -63,23 +65,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NoteItem({id, title, createdAt, body, archived}) {
+export default function NoteItem({title, createdAt, body, lists}) {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const goToDetails = () => {
+    dispatch(
+      setViewData({
+        lists,
+      }),
+    );
+    navigation.navigate('NoteDetails');
+  };
+
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate('NoteDetails', {
-          notesData: {
-            id,
-            title,
-            createdAt,
-            body,
-            archived,
-          },
-        })
-      }>
+    <TouchableOpacity style={styles.card} onPress={goToDetails}>
       <View style={styles.cardTitle}>
         <Text style={styles.title}>{title}</Text>
       </View>

@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {showFormattedDate} from '../../utils/notesData';
 import {
@@ -23,6 +24,7 @@ import {
   IconFolderMuted,
   IconVerticalMenu,
 } from '../../assets';
+import {archiveNote, deleteNote} from '../../redux/listsSlice';
 
 const windowWidth = Dimensions.get('window').width;
 const WindowHeight = Dimensions.get('window').height;
@@ -68,7 +70,16 @@ const styles = StyleSheet.create({
     color: FONT_COLOR,
     marginTop: -2,
     marginBottom: 10,
-    marginLeft: 20,
+    marginLeft: 25,
+    marginRight: 10,
+  },
+  dateData: {
+    fontFamily: 'Montserrat-Regular',
+    fontSize: 15,
+    color: FONT_COLOR,
+    marginTop: -2,
+    marginBottom: 10,
+    marginLeft: 55,
     marginRight: 10,
   },
   detailsBody: {
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: FONT_COLOR,
     marginTop: -2,
-    marginLeft: 20,
+    marginLeft: 25,
     marginBottom: 10,
     marginRight: 10,
   },
@@ -103,7 +114,6 @@ const styles = StyleSheet.create({
     width: windowWidth * 0.3,
     backgroundColor: BACKGROUND_COLOR_SECONDARY,
     borderRadius: 10,
-    visible: true,
   },
   dropDownMenuOption1: {
     flexDirection: 'row',
@@ -134,23 +144,44 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NoteDetailsPage({route}) {
+export default function NoteDetailsPage() {
+  const [notesData, setNotesData] = useState([]);
+  const viewData = useSelector(state => state.data.viewData);
+
+  useEffect(() => {
+    setNotesData(viewData);
+  }, [viewData]);
+
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const unArchiveButton = () => {
+    dispatch(
+      archiveNote({
+        id: notesData.id,
+      }),
+    );
+    setVisible(!visible);
+  };
 
   const archiveButton = () => {
-    navigation.navigate('NotesPage', {
-      setThisIdToArchived: route.params.notesData.id,
-    });
+    dispatch(
+      archiveNote({
+        id: notesData.id,
+      }),
+    );
     setVisible(!visible);
   };
 
   const deleteButton = () => {
-    navigation.navigate('NotesPage', {
-      setThisIdToDelete: route.params.notesData.id,
-    });
-    setVisible(!visible);
+    dispatch(
+      deleteNote({
+        id: notesData.id,
+      }),
+    );
+    navigation.navigate('NotesPage');
   };
   return (
     <View style={styles.detailsContainer}>
@@ -162,7 +193,7 @@ export default function NoteDetailsPage({route}) {
       <View style={styles.detailsContainerBody}>
         <View style={styles.detailsTitle}>
           <View style={styles.detailsTitleText}>
-            <Text style={styles.title}>{route.params.notesData.title}</Text>
+            <Text style={styles.title}>{notesData.title}</Text>
           </View>
           <TouchableOpacity
             style={styles.detailsTitleMenu}
@@ -170,16 +201,33 @@ export default function NoteDetailsPage({route}) {
             <IconVerticalMenu width={32} height={32} fillColor={FONT_COLOR} />
             {visible === true ? (
               <View style={styles.dropDownMenu}>
-                <TouchableOpacity onPress={archiveButton}>
-                  <View style={styles.dropDownMenuOption1}>
-                    <IconArchive
-                      width={18}
-                      height={32}
-                      fillColor={FONT_COLOR}
-                    />
-                    <Text style={styles.dropDownMenuOption1Text}>Archive</Text>
-                  </View>
-                </TouchableOpacity>
+                {notesData.archived === false ? (
+                  <TouchableOpacity onPress={archiveButton}>
+                    <View style={styles.dropDownMenuOption1}>
+                      <IconArchive
+                        width={18}
+                        height={32}
+                        fillColor={FONT_COLOR}
+                      />
+                      <Text style={styles.dropDownMenuOption1Text}>
+                        Archive
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity onPress={unArchiveButton}>
+                    <View style={styles.dropDownMenuOption1}>
+                      <IconArchive
+                        width={18}
+                        height={32}
+                        fillColor={FONT_COLOR}
+                      />
+                      <Text style={styles.dropDownMenuOption1Text}>
+                        UnArchive
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity onPress={deleteButton}>
                   <View style={styles.dropDownMenuOption2}>
                     <IconDelete width={18} height={32} fillColor={FONT_COLOR} />
@@ -193,21 +241,21 @@ export default function NoteDetailsPage({route}) {
         <View style={styles.detailsDate}>
           <IconCalendarMuted width={16} height={16} />
           <Text style={styles.date}>Date</Text>
-          <Text style={styles.date}>
-            {showFormattedDate(route.params.notesData.createdAt)}
+          <Text style={styles.dateData}>
+            {showFormattedDate(notesData.createdAt)}
           </Text>
         </View>
         <View style={styles.detailsLocation}>
           <IconFolderMuted width={16} height={16} />
           <Text style={styles.location}>Location</Text>
-          {route.params.notesData.archived === true ? (
+          {notesData.archived === true ? (
             <Text style={styles.location}>Archived</Text>
           ) : (
             <Text style={styles.location}>Active</Text>
           )}
         </View>
         <View style={styles.detailsBody}>
-          <Text style={styles.body}>{route.params.notesData.body}</Text>
+          <Text style={styles.body}>{notesData.body}</Text>
         </View>
       </View>
     </View>

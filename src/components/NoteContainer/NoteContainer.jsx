@@ -22,6 +22,7 @@ export default function NoteContainer({lists}) {
             <NoteItem
               key={list.id}
               id={list.id}
+              lists={list}
               title={list.title}
               createdAt={list.createdAt}
               body={list.body}

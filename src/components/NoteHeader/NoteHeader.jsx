@@ -2,7 +2,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import React from 'react';
-import SelectDropdown from 'react-native-select-dropdown';
 import {
   BACKGROUND_COLOR_PRIMARY,
   BACKGROUND_COLOR_SECONDARY,
@@ -46,21 +45,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function NoteHeader({onSearchTypeSelect}) {
-  const options = ['All', 'Active', 'Archived'];
-
+export default function NoteHeader() {
   return (
     <View style={styles.containerHeader}>
       <Text style={styles.headerTitle}>Notes App</Text>
-      <SelectDropdown
-        defaultValue={options[0]}
-        buttonStyle={styles.dropDownMenuButton}
-        buttonTextStyle={styles.dropDownMenuButtonText}
-        dropdownStyle={styles.dropDownMenu}
-        rowTextStyle={styles.dropDownMenuButtonText}
-        data={options}
-        onSelect={onSearchTypeSelect}
-      />
     </View>
   );
 }
