@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: 'Montserrat-ExtraBold',
     fontSize: 15,
     color: FONT_COLOR,
   },
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   date: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-LightItalic',
     fontSize: 15,
     color: FONT_COLOR,
   },

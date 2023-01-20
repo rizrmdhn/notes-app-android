@@ -42,9 +42,29 @@ export const listsSlice = createSlice({
                 state.lists = state.unFilteredLists;
             }
         },
-    },
+        editNotes: (state, action) => {
+            const index = state.lists.findIndex((list) => list.id === action.payload.id);
+            const newList = [...state.lists];
+            newList[index] = {
+                id: action.payload.id,
+                title: action.payload.title,
+                body: action.payload.body,
+                createdAt: Date.now(),
+                archived: action.payload.archived,
+            };
+            const newViewData = {
+                id: action.payload.id,
+                title: action.payload.title,
+                body: action.payload.body,
+                createdAt: Date.now(),
+                archived: action.payload.archived,
+            }
+            state.lists = newList;
+            state.viewData = newViewData;
+        }
+    }
 });
 
-export const { addNote, archiveNote, deleteNote, setViewData, searchNotes } = listsSlice.actions;
+export const { addNote, archiveNote, deleteNote, setViewData, searchNotes, editNotes } = listsSlice.actions;
 
 export default listsSlice.reducer;

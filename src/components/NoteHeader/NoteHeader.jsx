@@ -23,14 +23,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerTitle: {
-    marginTop: 20,
+    marginTop: 10,
     marginLeft: 10,
     fontFamily: 'Montserrat-Bold',
-    fontSize: 20,
+    fontSize: 25,
     color: 'white',
   },
   searchNotes: {
-    marginTop: 20,
+    marginTop: 10,
     marginRight: 20,
     width: windowWidth * 0.4,
     height: WindowHeight * 0.06,

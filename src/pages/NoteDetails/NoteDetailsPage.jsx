@@ -1,10 +1,15 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/prop-types */
 import {
   StyleSheet,
   Text,
   View,
+  Animated,
   TouchableOpacity,
   Dimensions,
+  TextInput,
+  ToastAndroid,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -24,7 +29,7 @@ import {
   IconFolderMuted,
   IconVerticalMenu,
 } from '../../assets';
-import {archiveNote, deleteNote} from '../../redux/listsSlice';
+import {archiveNote, deleteNote, editNotes} from '../../redux/listsSlice';
 
 const windowWidth = Dimensions.get('window').width;
 const WindowHeight = Dimensions.get('window').height;
@@ -53,7 +58,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: 'Montserrat-ExtraBold',
     fontSize: 25,
     color: FONT_COLOR,
   },
@@ -65,7 +70,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   date: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Bold',
     fontSize: 15,
     color: FONT_COLOR,
     marginTop: -2,
@@ -74,7 +79,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   dateData: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-LightItalic',
     fontSize: 15,
     color: FONT_COLOR,
     marginTop: -2,
@@ -83,10 +88,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   detailsBody: {
+    height: WindowHeight * 0.5,
+    flexWrap: 'wrap',
     marginTop: 25,
     marginLeft: 10,
   },
   body: {
+    width: windowWidth * 0.9,
     fontFamily: 'Montserrat-Regular',
     fontSize: 15,
     color: FONT_COLOR,
@@ -99,7 +107,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   location: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Bold',
+    fontSize: 15,
+    color: FONT_COLOR,
+    marginTop: -2,
+    marginLeft: 25,
+    marginBottom: 10,
+    marginRight: 10,
+  },
+  locationText: {
+    fontFamily: 'Montserrat-LightItalic',
     fontSize: 15,
     color: FONT_COLOR,
     marginTop: -2,
@@ -110,9 +127,9 @@ const styles = StyleSheet.create({
   dropDownMenu: {
     position: 'absolute',
     top: 30,
-    left: -100,
-    width: windowWidth * 0.3,
-    backgroundColor: BACKGROUND_COLOR_SECONDARY,
+    left: -120,
+    width: windowWidth * 0.35,
+    backgroundColor: '#333333',
     borderRadius: 10,
   },
   dropDownMenuOption1: {
@@ -142,20 +159,60 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: FONT_COLOR,
   },
+  editData: {
+    marginTop: 20,
+    width: windowWidth * 0.4,
+    height: WindowHeight * 0.05,
+    alignSelf: 'flex-end',
+    backgroundColor: BACKGROUND_COLOR_SECONDARY,
+  },
+  editDataText: {
+    fontFamily: 'Montserrat-Bold',
+    fontSize: 15,
+    color: FONT_COLOR,
+    alignSelf: 'center',
+    marginTop: 5,
+  },
 });
 
 export default function NoteDetailsPage() {
+  // for storing the data of the note
   const [notesData, setNotesData] = useState([]);
-  const viewData = useSelector(state => state.data.viewData);
+  const [body, setBody] = useState('');
 
+  // for storing the data of the note
+  const viewData = useSelector(state => state.data.viewData);
   useEffect(() => {
     setNotesData(viewData);
+    setBody(viewData.body);
   }, [viewData]);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  // for showing and hiding the drop down menu
   const [visible, setVisible] = useState(false);
+  // for showing and hiding the edit button
+  const [, setEditMode] = useState(false);
+
+  // animation for button
+  const opacity = useState(new Animated.Value(0))[0];
+
+  function fadeInButton() {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  function fadeOutButton() {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }
 
   const unArchiveButton = () => {
     dispatch(
@@ -175,6 +232,17 @@ export default function NoteDetailsPage() {
     setVisible(!visible);
   };
 
+  const editBodyData = text => {
+    setBody(text);
+    if (text === notesData.body) {
+      setEditMode(false);
+      fadeOutButton();
+    } else {
+      setEditMode(true);
+      fadeInButton();
+    }
+  };
+
   const deleteButton = () => {
     dispatch(
       deleteNote({
@@ -183,6 +251,25 @@ export default function NoteDetailsPage() {
     );
     navigation.navigate('NotesPage');
   };
+
+  const editButton = () => {
+    if (body === '') {
+      Alert.alert('Empty Note', 'Please enter some text to save the note');
+    } else if (body === notesData.body) {
+      Alert.alert('No Changes', 'Please edit the note to save the changes');
+    } else {
+      dispatch(
+        editNotes({
+          id: notesData.id,
+          title: notesData.title,
+          body,
+          archived: notesData.archived,
+        }),
+      );
+      ToastAndroid.show('Changes Saved', ToastAndroid.SHORT);
+    }
+  };
+
   return (
     <View style={styles.detailsContainer}>
       <TouchableOpacity onPress={() => navigation.navigate('NotesPage')}>
@@ -249,14 +336,26 @@ export default function NoteDetailsPage() {
           <IconFolderMuted width={16} height={16} />
           <Text style={styles.location}>Location</Text>
           {notesData.archived === true ? (
-            <Text style={styles.location}>Archived</Text>
+            <Text style={styles.locationText}>Archived</Text>
           ) : (
-            <Text style={styles.location}>Active</Text>
+            <Text style={styles.locationText}>Active</Text>
           )}
         </View>
         <View style={styles.detailsBody}>
-          <Text style={styles.body}>{notesData.body}</Text>
+          <TextInput
+            editable
+            multiline
+            numberOfLines={5}
+            style={styles.body}
+            value={body}
+            onChangeText={editBodyData}
+          />
         </View>
+        <Animated.View style={{opacity}}>
+          <TouchableOpacity style={styles.editData} onPress={editButton}>
+            <Text style={styles.editDataText}>Save Changes</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </View>
   );

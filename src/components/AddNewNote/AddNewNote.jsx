@@ -44,16 +44,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addNewTitle: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: 'Montserrat-ExtraBold',
     fontSize: 25,
     color: FONT_COLOR,
   },
   maxCharTitle: {
-    fontFamily: 'Montserrat-Regular',
     fontSize: 15,
     color: FONT_COLOR,
     textAlign: 'right',
-    marginRight: 15,
+    marginRight: 20,
   },
   addNoteContainerTitle: {
     marginTop: 20,
@@ -82,14 +81,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontFamily: 'Montserrat-Regular',
     fontSize: 15,
-    color: FONT_MUTED,
+    color: FONT_COLOR,
   },
   bodyInput: {
     height: WindowHeight * 0.25,
     marginLeft: 10,
     fontFamily: 'Montserrat-Regular',
     fontSize: 15,
-    color: FONT_MUTED,
+    color: FONT_COLOR,
   },
   addNoteContainerButton: {
     marginTop: 20,

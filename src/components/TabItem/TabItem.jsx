@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   text: isFocused => ({
+    fontFamily: isFocused ? 'Montserrat-Bold' : 'Montserrat-Regular',
     fontSize: 13,
     color: isFocused ? FONT_COLOR : FONT_MUTED,
     marginTop: 8,
